@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MH Compêndio — Ataques e Fraquezas</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c; --bg2: #1a1814; --bg3: #252320;
+    --border: #3a3530; --border2: #4a453f;
+    --text: #e8e0d0; --text2: #a09880; --text3: #6a6258;
+    --accent: #d8b980; --accent2: #e8b040;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Source Sans 3', sans-serif; font-size: 14px; min-height: 100vh; }
+  header { position: relative; background: linear-gradient(180deg,#1a1510 0%,#0f0e0c 100%); border-bottom: 1px solid var(--accent); padding: 20px 24px 16px; display: flex; align-items: center; gap: 14px; }
+  .vait-msg { position: absolute; top: 4px; left: 8px; font-size: 9px; color: #c04030; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; }
+  .logo { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700; color: var(--accent2); display: flex; align-items: center; }
+  .sub { font-size: 11px; color: var(--text3); font-family: 'Cinzel', serif; letter-spacing: .1em; text-transform: uppercase; }
+  .app { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 80px); }
+  .sidebar { background: var(--bg2); border-right: 1px solid var(--border); padding: 18px; overflow-y: auto; max-height: calc(100vh - 80px); }
+  .main { padding: 24px; overflow-y: auto; }
+  .sec-title { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: .15em; text-transform: uppercase; margin: 18px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .sec-title:first-child { margin-top: 0; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); padding: 9px 28px 9px 12px; font-size: 14px; cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236a6258' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; font-family: 'Source Sans 3', sans-serif; }
+  select:focus { border-color: var(--accent); }
+  select option { background: #1a1814; }
+  
+  .wtabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 10px; }
+  .wtab { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 6px; font-size: 11px; font-weight: 600; color: var(--text3); cursor: pointer; text-align: center; transition: all .15s; font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1px; }
+  .wtab:hover { border-color: var(--accent); color: var(--text2); }
+  .wtab.active { background: #2a2010; border-color: var(--accent); color: var(--accent2); }
+  
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .monster-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border2); padding-bottom: 14px; }
+  .m-name { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); }
+  .m-class { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 2px; }
+  
+  .badge-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .badge { padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 6px; }
+  
+  /* Cores de Badges baseadas no tipo */
+  .b-fisico { background: #2a2520; color: #d0c8b0; border: 1px solid #4a4540; }
+  .b-fogo { background: #3a1008; color: #e06040; border: 1px solid #5a2010; }
+  .b-agua { background: #081830; color: #4090e0; border: 1px solid #103050; }
+  .b-trovao { background: #2a2008; color: #d0a020; border: 1px solid #4a3808; }
+  .b-gelo { background: #081a20; color: #40c0d0; border: 1px solid #0a3040; }
+  .b-dragao { background: #180830; color: #a060e0; border: 1px solid #301060; }
+  .b-veneno { background: #1a082a; color: #b050d0; border: 1px solid #3a105a; }
+  .b-paralisia { background: #2a2500; color: #d0c030; border: 1px solid #4a4000; }
+  .b-sono { background: #0a1a2a; color: #50a0d0; border: 1px solid #103050; }
+  .b-explosao { background: #3a1a08; color: #e08040; border: 1px solid #5a2a10; }
+  .b-sangue { background: #4a0008; color: #ff4050; border: 1px solid #6a0010; }
+  .b-outro { background: #202020; color: #a0a0a0; border: 1px solid #404040; }
+
+  .empty-state { text-align: center; padding: 40px; color: var(--text3); font-style: italic; }
+
+  @media(max-width:900px){ .app{grid-template-columns:1fr;} .sidebar{max-height:none;border-right:none;border-bottom:1px solid var(--border);} }
+</style>
+</head>
+<body>
+<header>
+  <div class="vait-msg">VAIT - ISSO NÃO É REAL</div>
+  <div>
+    <div class="logo">
+      <img src="data:image/png;base64,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" alt="Logo MH" style="height:40px;width:40px;object-fit:contain;margin-right:10px;">
+      MH Compêndio
+    </div>
+    <div class="sub">Fraquezas</div>
+  </div>
+</header>
+<div class="app">
+  <div class="sidebar">
+    <div class="wtabs" id="gameTabs">
+      <button class="wtab active" onclick="setGame('world')">World</button>
+      <button class="wtab" onclick="setGame('rise')">Rise</button>
+      <button class="wtab" onclick="setGame('wilds')">Wilds</button>
+    </div>
+    
+    <div class="sec-title" id="selectTitle">Selecione o Monstro</div>
+    <div class="field">
+      <select id="monsterSel" onchange="showMonster()"></select>
+    </div>
+  </div>
+  
+  <div class="main">
+    <div id="monsterInfo">
+      <div class="empty-state">Selecione um monstro na barra lateral para ver os seus dados.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Banco de dados Completo dos Monstros com Status adicionados
+const MONSTERS = [
+  // --- MONSTER HUNTER WORLD & ICEBORNE ---
+  { game: 'world', id: 'great_jagras', name: 'Great Jagras', class: 'Fanged Wyvern', attacks: ['Físico'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★★)', 'Paralisia (★★★)', 'Explosão (★★★)', 'Atordoamento (★★★)'] },
+  { game: 'world', id: 'kulu_ya_ku', name: 'Kulu-Ya-Ku', class: 'Bird Wyvern', attacks: ['Físico'], weaknesses: ['Água (★★★)', 'Fogo (★★)', 'Trovão (★★)', 'Gelo (★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'pukei_pukei', name: 'Pukei-Pukei', class: 'Bird Wyvern', attacks: ['Físico', 'Veneno'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★★)', 'Paralisia (★★★)', 'Veneno (★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'barroth', name: 'Barroth', class: 'Brute Wyvern', attacks: ['Físico', 'Água', 'Lama'], weaknesses: ['Fogo (★★★ - sem lama)', 'Água (★★★ - com lama)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Paralisia (★★★)', 'Explosão (★★★)', 'Sono (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'jyuratodus', name: 'Jyuratodus', class: 'Piscine Wyvern', attacks: ['Físico', 'Água', 'Lama'], weaknesses: ['Trovão (★★★ - sem lama)', 'Água (★★★ - com lama)'], statusWeaknesses: ['Atordoamento (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'tobi_kadachi', name: 'Tobi-Kadachi', class: 'Fanged Wyvern', attacks: ['Físico', 'Trovão'], weaknesses: ['Água (★★★)', 'Fogo (★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'anjanath', name: 'Anjanath', class: 'Brute Wyvern', attacks: ['Físico', 'Fogo'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Veneno (★★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'rathian', name: 'Rathian', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Atordoamento (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Veneno (★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'tzitzi_ya_ku', name: 'Tzitzi-Ya-Ku', class: 'Bird Wyvern', attacks: ['Físico', 'Atordoamento'], weaknesses: ['Trovão (★★★)', 'Gelo (★★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'paolumu', name: 'Paolumu', class: 'Wyvern Voador', attacks: ['Físico', 'Vento'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Atordoamento (★★★)', 'Explosão (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)'] },
+  { game: 'world', id: 'great_girros', name: 'Great Girros', class: 'Fanged Wyvern', attacks: ['Físico', 'Paralisia'], weaknesses: ['Água (★★★)', 'Fogo (★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★★)', 'Veneno (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'radobaan', name: 'Radobaan', class: 'Brute Wyvern', attacks: ['Físico', 'Sono'], weaknesses: ['Dragão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Explosão (★★★)', 'Veneno (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Sono (★)'] },
+  { game: 'world', id: 'legiana', name: 'Legiana', class: 'Wyvern Voador', attacks: ['Físico', 'Gelo'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'odogaron', name: 'Odogaron', class: 'Fanged Wyvern', attacks: ['Físico', 'Sangramento'], weaknesses: ['Gelo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Paralisia (★★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Veneno (★)'] },
+  { game: 'world', id: 'rathalos', name: 'Rathalos', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno', 'Atordoamento'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Veneno (★)', 'Explosão (★)'] },
+  { game: 'world', id: 'diablos', name: 'Diablos', class: 'Wyvern Voador', attacks: ['Físico', 'Atordoamento'], weaknesses: ['Gelo (★★★)', 'Dragão (★★)', 'Água (★★)'], statusWeaknesses: ['Paralisia (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'kirin', name: 'Kirin', class: 'Elder Dragon', attacks: ['Físico', 'Trovão', 'Paralisia'], weaknesses: ['Fogo (★★★)', 'Água (★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★)', 'Explosão (★★)', 'Veneno (★)', 'Atordoamento (★)', 'Paralisia (✕)'] },
+  { game: 'world', id: 'zorah_magdaros', name: 'Zorah Magdaros', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Explosão'], weaknesses: ['Dragão (★★★)', 'Água (★★★)'], statusWeaknesses: ['Resistente/Imune a armadilhas e maioria dos status'] },
+  { game: 'world', id: 'dodogama', name: 'Dodogama', class: 'Fanged Wyvern', attacks: ['Físico', 'Explosão'], weaknesses: ['Trovão (★★★)', 'Água (★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★)'] },
+  { game: 'world', id: 'pink_rathian', name: 'Pink Rathian', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Atordoamento (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Veneno (★)'] },
+  { game: 'world', id: 'azure_rathalos', name: 'Azure Rathalos', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Dragão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★)', 'Veneno (★)'] },
+  { game: 'world', id: 'black_diablos', name: 'Black Diablos', class: 'Wyvern Voador', attacks: ['Físico', 'Atordoamento'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Paralisia (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'nergigante', name: 'Nergigante', class: 'Elder Dragon', attacks: ['Físico'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'teostra', name: 'Teostra', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Explosão'], weaknesses: ['Água (★★★)', 'Gelo (★★★)'], statusWeaknesses: ['Veneno (★★)', 'Atordoamento (★★)', 'Sono (★)', 'Paralisia (★)', 'Explosão (★)'] },
+  { game: 'world', id: 'kushala_daora', name: 'Kushala Daora', class: 'Elder Dragon', attacks: ['Físico', 'Gelo', 'Vento'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)', 'Veneno (★★★)'], statusWeaknesses: ['Veneno (★★★)', 'Explosão (★★★)', 'Atordoamento (★★)', 'Sono (★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'vaal_hazak', name: 'Vaal Hazak', class: 'Elder Dragon', attacks: ['Físico', 'Eflúvio'], weaknesses: ['Fogo (★★★)', 'Dragão (★★★)'], statusWeaknesses: ['Explosão (★★)', 'Atordoamento (★★)', 'Veneno (★)', 'Sono (★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'lunastra', name: 'Lunastra', class: 'Elder Dragon', attacks: ['Físico', 'Fogo'], weaknesses: ['Gelo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Explosão (★★)', 'Atordoamento (★★)', 'Veneno (★)', 'Sono (★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'xeno_jiiva', name: 'Xeno\'jiiva', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Dragão', 'Explosão'], weaknesses: ['Todos (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Explosão (★★)', 'Paralisia (★)', 'Atordoamento (★)', 'Sono (✕)'] },
+  { game: 'world', id: 'kulve_taroth', name: 'Kulve Taroth', class: 'Elder Dragon', attacks: ['Físico', 'Fogo'], weaknesses: ['Trovão (★★★ - Ouro)', 'Gelo (★★★ - Libertada)'], statusWeaknesses: ['Veneno (★)', 'Sono (★)', 'Paralisia (★)', 'Explosão (★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'deviljho', name: 'Deviljho', class: 'Brute Wyvern', attacks: ['Físico', 'Dragão'], weaknesses: ['Trovão (★★★)', 'Dragão (★★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'behemoth', name: 'Behemoth', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Trovão', 'Meteoro'], weaknesses: ['Dragão (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'leshen', name: 'Leshen', class: 'Relic', attacks: ['Físico', 'Revolta da Natureza', 'Corvos'], weaknesses: ['Fogo (★★★)'], statusWeaknesses: ['Veneno (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★★)', 'Sono (★)'] },
+  { game: 'world', id: 'beotodus', name: 'Beotodus', class: 'Piscine Wyvern', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Explosão (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'banbaro', name: 'Banbaro', class: 'Brute Wyvern', attacks: ['Físico', 'Gelo'], weaknesses: ['Dragão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Explosão (★★★)', 'Atordoamento (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)'] },
+  { game: 'world', id: 'viper_tobi', name: 'Viper Tobi-Kadachi', class: 'Fanged Wyvern', attacks: ['Físico', 'Veneno', 'Paralisia'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Veneno (★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'nightshade_paolumu', name: 'Nightshade Paolumu', class: 'Wyvern Voador', attacks: ['Físico', 'Sono'], weaknesses: ['Água (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Atordoamento (★★★)', 'Explosão (★★★)', 'Veneno (★★)', 'Paralisia (★★)', 'Sono (★)'] },
+  { game: 'world', id: 'coral_pukei', name: 'Coral Pukei-Pukei', class: 'Bird Wyvern', attacks: ['Físico', 'Água'], weaknesses: ['Gelo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★★)', 'Paralisia (★★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'barioth', name: 'Barioth', class: 'Wyvern Voador', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'nargacuga', name: 'Nargacuga', class: 'Wyvern Voador', attacks: ['Físico', 'Sangramento'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'glavenus', name: 'Glavenus', class: 'Brute Wyvern', attacks: ['Físico', 'Fogo'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★)'] },
+  { game: 'world', id: 'tigrex', name: 'Tigrex', class: 'Wyvern Voador', attacks: ['Físico'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'brachydios', name: 'Brachydios', class: 'Brute Wyvern', attacks: ['Físico', 'Explosão'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★)'] },
+  { game: 'world', id: 'shrieking_legiana', name: 'Shrieking Legiana', class: 'Wyvern Voador', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'fulgur_anjanath', name: 'Fulgur Anjanath', class: 'Brute Wyvern', attacks: ['Físico', 'Trovão'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Veneno (★★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'ebony_odogaron', name: 'Ebony Odogaron', class: 'Fanged Wyvern', attacks: ['Físico', 'Dragão', 'Sangramento'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Paralisia (★★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Veneno (★)'] },
+  { game: 'world', id: 'acidic_glavenus', name: 'Acidic Glavenus', class: 'Brute Wyvern', attacks: ['Físico', 'Redução de Defesa'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'seething_bazelgeuse', name: 'Seething Bazelgeuse', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Explosão'], weaknesses: ['Gelo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★)'] },
+  { game: 'world', id: 'blackveil_vaal_hazak', name: 'Blackveil Vaal Hazak', class: 'Elder Dragon', attacks: ['Físico', 'Eflúvio'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Explosão (★★)', 'Atordoamento (★★)', 'Veneno (★)', 'Sono (★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'namielle', name: 'Namielle', class: 'Elder Dragon', attacks: ['Físico', 'Água', 'Trovão'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Explosão (★★)', 'Sono (★)', 'Paralisia (★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'savage_deviljho', name: 'Savage Deviljho', class: 'Brute Wyvern', attacks: ['Físico', 'Dragão', 'Redução de Defesa'], weaknesses: ['Dragão (★★★)', 'Trovão (★★★)', 'Fogo (★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★★)'] },
+  { game: 'world', id: 'ruiner_nergigante', name: 'Ruiner Nergigante', class: 'Elder Dragon', attacks: ['Físico', 'Sangramento'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Explosão (★★)', 'Veneno (★)', 'Sono (★)', 'Paralisia (★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'shara_ishvalda', name: 'Shara Ishvalda', class: 'Elder Dragon', attacks: ['Físico', 'Vento', 'Areia'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Explosão (★★★)', 'Veneno (★★)', 'Paralisia (★)', 'Atordoamento (★)', 'Sono (✕)'] },
+  { game: 'world', id: 'zinogre', name: 'Zinogre', class: 'Fanged Wyvern', attacks: ['Físico', 'Trovão', 'Paralisia'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'stygian_zinogre', name: 'Stygian Zinogre', class: 'Fanged Wyvern', attacks: ['Físico', 'Dragão'], weaknesses: ['Trovão (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Paralisia (★)'] },
+  { game: 'world', id: 'rajang', name: 'Rajang', class: 'Fanged Beast', attacks: ['Físico', 'Trovão'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Explosão (★★)', 'Veneno (★)', 'Sono (★)', 'Paralisia (★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'furious_rajang', name: 'Furious Rajang', class: 'Fanged Beast', attacks: ['Físico', 'Trovão'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Explosão (★★)', 'Veneno (★)', 'Sono (★)', 'Paralisia (★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'brute_tigrex', name: 'Brute Tigrex', class: 'Wyvern Voador', attacks: ['Físico', 'Rugido'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'gold_rathian', name: 'Gold Rathian', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno Letal'], weaknesses: ['Trovão (★★★)', 'Água (★★)'], statusWeaknesses: ['Atordoamento (★★)', 'Sono (★)', 'Paralisia (★)', 'Explosão (★)', 'Veneno (✕)'] },
+  { game: 'world', id: 'silver_rathalos', name: 'Silver Rathalos', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Atordoamento (★★)', 'Sono (★)', 'Paralisia (★)', 'Explosão (★)', 'Veneno (✕)'] },
+  { game: 'world', id: 'raging_brachydios', name: 'Raging Brachydios', class: 'Brute Wyvern', attacks: ['Físico', 'Explosão', 'Lodo Flash'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★)'] },
+  { game: 'world', id: 'safi_jiiva', name: 'Safi\'jiiva', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Dragão', 'Energia'], weaknesses: ['Dragão (★★★)', 'Veneno (★★★)'], statusWeaknesses: ['Veneno (★★★)', 'Explosão (★★★)', 'Paralisia (★★)', 'Sono (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'alatreon', name: 'Alatreon', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Gelo', 'Trovão', 'Água', 'Dragão'], weaknesses: ['Varia com a forma ativa (Fogo/Gelo/Dragão)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★)', 'Paralisia (★)', 'Explosão (★)', 'Atordoamento (★)'] },
+  { game: 'world', id: 'frostfang_barioth', name: 'Frostfang Barioth', class: 'Wyvern Voador', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'world', id: 'fatalis', name: 'Fatalis', class: 'Elder Dragon', attacks: ['Físico', 'Fogo'], weaknesses: ['Dragão (★★★)', 'Fogo (★)'], statusWeaknesses: ['Veneno (★)', 'Sono (★)', 'Paralisia (★)', 'Explosão (★)', 'Atordoamento (✕)'] },
+
+  // --- MONSTER HUNTER RISE & SUNBREAK ---
+  { game: 'rise', id: 'great_izuchi', name: 'Great Izuchi', class: 'Bird Wyvern', attacks: ['Físico'], weaknesses: ['Trovão (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★★)', 'Paralisia (★★★)', 'Explosão (★★★)', 'Atordoamento (★★★)'] },
+  { game: 'rise', id: 'great_baggi', name: 'Great Baggi', class: 'Bird Wyvern', attacks: ['Físico', 'Sono'], weaknesses: ['Fogo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Paralisia (★★★)', 'Explosão (★★★)', 'Atordoamento (★★★)', 'Sono (✕)'] },
+  { game: 'rise', id: 'kulu_ya_ku_rise', name: 'Kulu-Ya-Ku', class: 'Bird Wyvern', attacks: ['Físico'], weaknesses: ['Água (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'great_wroggi', name: 'Great Wroggi', class: 'Bird Wyvern', attacks: ['Físico', 'Veneno'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Sono (★★★)', 'Paralisia (★★★)', 'Explosão (★★★)', 'Atordoamento (★★★)', 'Veneno (✕)'] },
+  { game: 'rise', id: 'arzuros', name: 'Arzuros', class: 'Fanged Beast', attacks: ['Físico'], weaknesses: ['Fogo (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★★)', 'Paralisia (★★★)', 'Explosão (★★)', 'Atordoamento (★★★)'] },
+  { game: 'rise', id: 'lagombi', name: 'Lagombi', class: 'Fanged Beast', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Paralisia (★★★)', 'Explosão (★★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'volvidon', name: 'Volvidon', class: 'Fanged Beast', attacks: ['Físico', 'Paralisia', 'Mau Cheiro'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★★)', 'Paralisia (★)'] },
+  { game: 'rise', id: 'aknosom', name: 'Aknosom', class: 'Bird Wyvern', attacks: ['Físico', 'Fogo'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'royal_ludroth', name: 'Royal Ludroth', class: 'Leviathan', attacks: ['Físico', 'Água'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'barroth_rise', name: 'Barroth', class: 'Brute Wyvern', attacks: ['Físico', 'Água', 'Lama'], weaknesses: ['Fogo (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Paralisia (★★★)', 'Explosão (★★★)', 'Sono (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'khezu', name: 'Khezu', class: 'Wyvern Voador', attacks: ['Físico', 'Trovão', 'Paralisia'], weaknesses: ['Fogo (★★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Paralisia (★)'] },
+  { game: 'rise', id: 'tetranadon', name: 'Tetranadon', class: 'Amphibian', attacks: ['Físico', 'Água'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'bishaten', name: 'Bishaten', class: 'Fanged Beast', attacks: ['Físico', 'Veneno', 'Paralisia'], weaknesses: ['Gelo (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'pukei_pukei_rise', name: 'Pukei-Pukei', class: 'Bird Wyvern', attacks: ['Físico', 'Veneno'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★★)', 'Paralisia (★★★)', 'Veneno (★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'jyuratodus_rise', name: 'Jyuratodus', class: 'Piscine Wyvern', attacks: ['Físico', 'Água', 'Lama'], weaknesses: ['Trovão (★★★)'], statusWeaknesses: ['Atordoamento (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)'] },
+  { game: 'rise', id: 'basarios', name: 'Basarios', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno', 'Sono'], weaknesses: ['Dragão (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★★)', 'Paralisia (★★)', 'Explosão (★★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'somnacanth', name: 'Somnacanth', class: 'Leviathan', attacks: ['Físico', 'Sono', 'Explosão'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Sono (✕)'] },
+  { game: 'rise', id: 'rathian_rise', name: 'Rathian', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Atordoamento (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Veneno (★)', 'Explosão (★★)'] },
+  { game: 'rise', id: 'barioth_rise', name: 'Barioth', class: 'Wyvern Voador', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'tobi_kadachi_rise', name: 'Tobi-Kadachi', class: 'Fanged Wyvern', attacks: ['Físico', 'Trovão', 'Paralisia'], weaknesses: ['Água (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'magnamalo', name: 'Magnamalo', class: 'Fanged Wyvern', attacks: ['Físico', 'Fogo do Inferno'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'anjanath_rise', name: 'Anjanath', class: 'Brute Wyvern', attacks: ['Físico', 'Fogo'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Veneno (★★)', 'Explosão (★★)'] },
+  { game: 'rise', id: 'nargacuga_rise', name: 'Nargacuga', class: 'Wyvern Voador', attacks: ['Físico'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'mizutsune', name: 'Mizutsune', class: 'Leviathan', attacks: ['Físico', 'Água', 'Espuma'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'goss_harag', name: 'Goss Harag', class: 'Fanged Beast', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Explosão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'rathalos_rise', name: 'Rathalos', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Veneno (★)', 'Explosão (★)'] },
+  { game: 'rise', id: 'almudron', name: 'Almudron', class: 'Leviathan', attacks: ['Físico', 'Lama Dourada'], weaknesses: ['Fogo (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'zinogre_rise', name: 'Zinogre', class: 'Fanged Wyvern', attacks: ['Físico', 'Trovão', 'Paralisia'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★★)', 'Paralisia (★)'] },
+  { game: 'rise', id: 'tigrex_rise', name: 'Tigrex', class: 'Wyvern Voador', attacks: ['Físico'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'diablos_rise', name: 'Diablos', class: 'Wyvern Voador', attacks: ['Físico', 'Atordoamento'], weaknesses: ['Gelo (★★★)', 'Água (★★)', 'Dragão (★★)'], statusWeaknesses: ['Paralisia (★★★)', 'Veneno (★★)', 'Sono (★★)', 'Explosão (★★)', 'Atordoamento (★)'] },
+  { game: 'rise', id: 'rakna_kadaki', name: 'Rakna-Kadaki', class: 'Temnoceran', attacks: ['Físico', 'Fogo', 'Teia'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'kushala_daora_rise', name: 'Kushala Daora', class: 'Elder Dragon', attacks: ['Físico', 'Gelo', 'Vento'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)', 'Explosão (★★★)'], statusWeaknesses: ['Veneno (★★★)', 'Explosão (★★★)', 'Atordoamento (★★)', 'Sono (★)', 'Paralisia (★)'] },
+  { game: 'rise', id: 'chameleos', name: 'Chameleos', class: 'Elder Dragon', attacks: ['Físico', 'Veneno'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)', 'Explosão (★★★)'], statusWeaknesses: ['Explosão (★★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Veneno (✕)'] },
+  { game: 'rise', id: 'teostra_rise', name: 'Teostra', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Explosão'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Atordoamento (★★)', 'Sono (★)', 'Paralisia (★)', 'Explosão (★)'] },
+  { game: 'rise', id: 'rajang_rise', name: 'Rajang', class: 'Fanged Beast', attacks: ['Físico', 'Trovão'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Explosão (★★)', 'Veneno (★)', 'Sono (★)', 'Paralisia (★)', 'Atordoamento (★)'] },
+  { game: 'rise', id: 'bazelgeuse_rise', name: 'Bazelgeuse', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Explosão'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Atordoamento (★★)', 'Explosão (★)'] },
+  { game: 'rise', id: 'ibushi', name: 'Wind Serpent Ibushi', class: 'Elder Dragon', attacks: ['Físico', 'Dragão', 'Vento'], weaknesses: ['Fogo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'narwa', name: 'Thunder Serpent Narwa', class: 'Elder Dragon', attacks: ['Físico', 'Trovão'], weaknesses: ['Dragão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'allmother_narwa', name: 'Narwa the Allmother', class: 'Elder Dragon', attacks: ['Físico', 'Trovão', 'Dragão', 'Vento'], weaknesses: ['Dragão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'valstrax', name: 'Crimson Glow Valstrax', class: 'Elder Dragon', attacks: ['Físico', 'Dragão'], weaknesses: ['Nenhum (Resistente quando coberto de energia)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'daimyo_hermitaur', name: 'Daimyo Hermitaur', class: 'Carapaceon', attacks: ['Físico', 'Água'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'blood_orange_bishaten', name: 'Blood Orange Bishaten', class: 'Fanged Beast', attacks: ['Físico', 'Explosão'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'garangolm', name: 'Garangolm', class: 'Fanged Beast', attacks: ['Físico', 'Fogo', 'Água'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'shogun_ceanataur', name: 'Shogun Ceanataur', class: 'Carapaceon', attacks: ['Físico', 'Sangramento', 'Água'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'aurora_somnacanth', name: 'Aurora Somnacanth', class: 'Leviathan', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'lunagaron', name: 'Lunagaron', class: 'Fanged Wyvern', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'astalos', name: 'Astalos', class: 'Wyvern Voador', attacks: ['Físico', 'Trovão', 'Paralisia'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'seregios', name: 'Seregios', class: 'Wyvern Voador', attacks: ['Físico', 'Sangramento'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'magma_almudron', name: 'Magma Almudron', class: 'Leviathan', attacks: ['Físico', 'Fogo', 'Explosão'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'espinas', name: 'Espinas', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno', 'Paralisia'], weaknesses: ['Gelo (★★★)', 'Explosão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'gore_magala', name: 'Gore Magala', class: '???', attacks: ['Físico', 'Frenzy'], weaknesses: ['Fogo (★★★)', 'Explosão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'pyre_rakna_kadaki', name: 'Pyre Rakna-Kadaki', class: 'Temnoceran', attacks: ['Físico', 'Fogo', 'Explosão', 'Teia'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'malzeno', name: 'Malzeno', class: 'Elder Dragon', attacks: ['Físico', 'Dragão', 'Praga de Sangue'], weaknesses: ['Dragão (★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'shagaru_magala', name: 'Shagaru Magala', class: 'Elder Dragon', attacks: ['Físico', 'Frenzy'], weaknesses: ['Veneno (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'furious_rajang_rise', name: 'Furious Rajang', class: 'Fanged Beast', attacks: ['Físico', 'Trovão'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'scorned_magnamalo', name: 'Scorned Magnamalo', class: 'Fanged Wyvern', attacks: ['Físico', 'Fogo do Inferno', 'Dragão'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'gaismagorm', name: 'Gaismagorm', class: 'Elder Dragon', attacks: ['Físico', 'Cristais Explosivos', 'Fogo'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'lucent_nargacuga', name: 'Lucent Nargacuga', class: 'Wyvern Voador', attacks: ['Físico', 'Veneno'], weaknesses: ['Gelo (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'violet_mizutsune', name: 'Violet Mizutsune', class: 'Leviathan', attacks: ['Físico', 'Fogo', 'Espuma'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'flaming_espinas', name: 'Flaming Espinas', class: 'Wyvern Voador', attacks: ['Físico', 'Fogo', 'Veneno', 'Paralisia', 'Redução de Defesa'], weaknesses: ['Água (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'chaotic_gore_magala', name: 'Chaotic Gore Magala', class: '???', attacks: ['Físico', 'Frenzy'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'velkhana_rise', name: 'Velkhana', class: 'Elder Dragon', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)', 'Explosão (★★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'amatsu', name: 'Amatsu', class: 'Elder Dragon', attacks: ['Físico', 'Água', 'Trovão', 'Vento'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+  { game: 'rise', id: 'primordial_malzeno', name: 'Primordial Malzeno', class: 'Elder Dragon', attacks: ['Físico', 'Dragão', 'Praga de Sangue'], weaknesses: ['Dragão (★★)', 'Gelo (★★)'], statusWeaknesses: ['Veneno (★★)', 'Sono (★★)', 'Paralisia (★★)', 'Explosão (★★)', 'Atordoamento (★★)'] },
+
+  // --- MONSTER HUNTER WILDS ---
+  { game: 'wilds', id: 'ajarakan', name: 'Ajarakan', class: 'Fanged Beast', attacks: ['Físico', 'Fogo'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'arkveld', name: 'Arkveld', class: 'Flying Wyvern', attacks: ['Físico', 'Correntes'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'balahara', name: 'Balahara', class: 'Leviathan', attacks: ['Físico', 'Areia', 'Muco'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'blangonga', name: 'Blangonga', class: 'Fanged Beast', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'chatacabra', name: 'Chatacabra', class: 'Amphibian', attacks: ['Físico', 'Saliva'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'congalala', name: 'Congalala', class: 'Fanged Beast', attacks: ['Físico', 'Gás Tóxico'], weaknesses: ['Fogo (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'doshaguma', name: 'Doshaguma', class: 'Fanged Beast', attacks: ['Físico'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'gogmazios', name: 'Gogmazios', class: 'Elder Dragon', attacks: ['Físico', 'Fogo', 'Piche'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'gore_magala_wilds', name: 'Gore Magala', class: 'Demi Elder', attacks: ['Físico', 'Frenzy'], weaknesses: ['Fogo (★★★)', 'Explosão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'gravios', name: 'Gravios', class: 'Flying Wyvern', attacks: ['Físico', 'Fogo', 'Sono'], weaknesses: ['Água (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'guardian_arkveld', name: 'Guardian Arkveld', class: 'Construct', attacks: ['Físico', 'Cristais'], weaknesses: ['Dragão (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'guardian_doshaguma', name: 'Guardian Doshaguma', class: 'Construct', attacks: ['Físico', 'Cristais'], weaknesses: ['Fogo (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'guardian_ebony_odogaron', name: 'Guardian Ebony Odogaron', class: 'Construct', attacks: ['Físico', 'Dragão', 'Sangramento'], weaknesses: ['Água (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'guardian_fulgur_anjanath', name: 'Guardian Fulgur Anjanath', class: 'Construct', attacks: ['Físico', 'Trovão', 'Cristais'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'guardian_rathalos', name: 'Guardian Rathalos', class: 'Construct', attacks: ['Físico', 'Fogo', 'Cristais'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'gypceros', name: 'Gypceros', class: 'Bird Wyvern', attacks: ['Físico', 'Veneno', 'Atordoamento'], weaknesses: ['Fogo (★★★)', 'Água (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'hirabami', name: 'Hirabami', class: 'Leviathan', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'jin_dahaad', name: 'Jin Dahaad', class: 'Leviathan', attacks: ['Físico', 'Gelo'], weaknesses: ['Fogo (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'lagiacrus', name: 'Lagiacrus', class: 'Leviathan', attacks: ['Físico', 'Trovão'], weaknesses: ['Fogo (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'lala_barina', name: 'Lala Barina', class: 'Temnoceran', attacks: ['Físico', 'Veneno', 'Paralisia'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'mizutsune_wilds', name: 'Mizutsune', class: 'Leviathan', attacks: ['Físico', 'Água', 'Espuma'], weaknesses: ['Trovão (★★★)', 'Dragão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'nerscylla', name: 'Nerscylla', class: 'Temnoceran', attacks: ['Físico', 'Veneno', 'Sono'], weaknesses: ['Fogo (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'nu_udra', name: 'Nu Udra', class: 'Cephalopod', attacks: ['Físico', 'Fogo'], weaknesses: ['Água (★★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'omega_planetes', name: 'Omega Planetes', class: 'Elder Dragon', attacks: ['Físico', 'Desconhecido'], weaknesses: ['Desconhecido'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'quematrice', name: 'Quematrice', class: 'Brute Wyvern', attacks: ['Físico', 'Fogo', 'Explosão'], weaknesses: ['Água (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'rathalos_wilds', name: 'Rathalos', class: 'Flying Wyvern', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'rathian_wilds', name: 'Rathian', class: 'Flying Wyvern', attacks: ['Físico', 'Fogo', 'Veneno'], weaknesses: ['Dragão (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'rey_dau', name: 'Rey Dau', class: 'Flying Wyvern', attacks: ['Físico', 'Trovão'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'rompopolo', name: 'Rompopolo', class: 'Brute Wyvern', attacks: ['Físico', 'Gás Tóxico', 'Explosão'], weaknesses: ['Água (★★★)', 'Trovão (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'seregios_wilds', name: 'Seregios', class: 'Flying Wyvern', attacks: ['Físico', 'Sangramento'], weaknesses: ['Trovão (★★★)', 'Gelo (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'uth_duna', name: 'Uth Duna', class: 'Leviathan', attacks: ['Físico', 'Água'], weaknesses: ['Trovão (★★★)', 'Fogo (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'xu_wu', name: 'Xu Wu', class: 'Cephalopod', attacks: ['Físico', 'Desconhecido'], weaknesses: ['Desconhecido'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'yian_kut_ku', name: 'Yian Kut-Ku', class: 'Bird Wyvern', attacks: ['Físico', 'Fogo'], weaknesses: ['Gelo (★★★)', 'Água (★★)'], statusWeaknesses: ['Desconhecido'] },
+  { game: 'wilds', id: 'zoh_shia', name: 'Zoh Shia', class: 'Construct', attacks: ['Físico', 'Cristais'], weaknesses: ['Desconhecido'], statusWeaknesses: ['Desconhecido'] }
+];
+
+// Ordenar a lista principal por ordem alfabética para sempre exibir correto no dropdown
+MONSTERS.sort((a, b) => a.name.localeCompare(b.name));
+
+let currentGame = 'world';
+
+function setGame(gameId) {
+  currentGame = gameId;
+  
+  // Atualiza UI das abas
+  const tabs = document.querySelectorAll('.wtab');
+  tabs.forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  populateDropdown();
+}
+
+function populateDropdown() {
+  const sel = document.getElementById('monsterSel');
+  sel.innerHTML = '';
+  
+  const filtered = MONSTERS.filter(m => m.game === currentGame);
+  
+  if (filtered.length === 0) {
+    const opt = document.createElement('option');
+    opt.textContent = "Nenhum monstro encontrado.";
+    sel.appendChild(opt);
+    document.getElementById('monsterInfo').innerHTML = `<div class="empty-state">Sem dados.</div>`;
+    return;
+  }
+  
+  filtered.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = m.name;
+    sel.appendChild(opt);
+  });
+  
+  showMonster(); // Atualiza a tela com o primeiro da lista
+}
+
+function getBadgeClass(typeStr) {
+  const t = typeStr.toLowerCase();
+  if(t.includes('físico')) return 'b-fisico';
+  if(t.includes('fogo')) return 'b-fogo';
+  if(t.includes('água') || t.includes('agua')) return 'b-agua';
+  if(t.includes('trovão') || t.includes('trovao')) return 'b-trovao';
+  if(t.includes('gelo')) return 'b-gelo';
+  if(t.includes('dragão') || t.includes('dragao')) return 'b-dragao';
+  
+  if(t.includes('veneno')) return 'b-veneno';
+  if(t.includes('paralisia')) return 'b-paralisia';
+  if(t.includes('sono')) return 'b-sono';
+  if(t.includes('explosão') || t.includes('explosao')) return 'b-explosao';
+  if(t.includes('sangue')) return 'b-sangue';
+  if(t.includes('atordoamento')) return 'b-atordoamento';
+  if(t.includes('flagelo')) return 'b-flagelo';
+  
+  return 'b-outro';
+}
+
+function showMonster() {
+  const selVal = document.getElementById('monsterSel').value;
+  const m = MONSTERS.find(x => x.id === selVal && x.game === currentGame);
+  const container = document.getElementById('monsterInfo');
+  
+  if(!m) {
+    container.innerHTML = `<div class="empty-state">Selecione um monstro.</div>`;
+    return;
+  }
+  
+  // Renderização das badges de ataque
+  let attackHtml = '';
+  m.attacks.forEach(atk => {
+    attackHtml += `<div class="badge ${getBadgeClass(atk)}">${atk}</div>`;
+  });
+  
+  // Renderização das badges de fraqueza elemental
+  let weakHtml = '';
+  m.weaknesses.forEach(wk => {
+    weakHtml += `<div class="badge ${getBadgeClass(wk)}">${wk}</div>`;
+  });
+
+  // Renderização das badges de fraqueza de Status
+  let statusHtml = '';
+  if (m.statusWeaknesses && m.statusWeaknesses.length > 0) {
+    m.statusWeaknesses.forEach(st => {
+      statusHtml += `<div class="badge ${getBadgeClass(st)}">${st}</div>`;
+    });
+  } else {
+    statusHtml = '<div style="font-size: 13px; color: var(--text3);">Desconhecido / Nenhum</div>';
+  }
+
+  container.innerHTML = `
+    <div class="card">
+      <div class="monster-header">
+        <div class="m-name">${m.name}</div>
+        <div class="m-class">${m.class}</div>
+      </div>
+      
+      <div class="sec-title">Tipos de Dano (Ataques)</div>
+      <div class="badge-container">
+        ${attackHtml}
+      </div>
+      
+      <div class="sec-title">Fraquezas Elementais</div>
+      <div class="badge-container">
+        ${weakHtml}
+      </div>
+
+      <div class="sec-title">Fraquezas de Status (Doenças)</div>
+      <div class="badge-container" style="margin-bottom: 0;">
+        ${statusHtml}
+      </div>
+    </div>
+  `;
+}
+
+// Inicializa a página
+populateDropdown();
+</script>
+</body>
+</html>
